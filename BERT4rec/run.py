@@ -72,6 +72,8 @@ parser.add_argument("--max_predictions_per_seq", default=20, type=int,
 
 parser.add_argument("--do_train", default=False, type=bool, help="Whether to run training.")
 
+parser.add_argument("--changed", default=False, type=bool, help="Whether to run training.")
+
 parser.add_argument("--do_eval", default=False, type=bool, help="Whether to run eval on the dev set.")
 
 #flags.DEFINE_integer("train_batch_size", 32, "Total batch size for training.")
@@ -342,7 +344,7 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
         if mode == tf.estimator.ModeKeys.TRAIN:
             train_op = optimization.create_optimizer(total_loss, learning_rate,
                                                      num_train_steps,
-                                                     num_warmup_steps, use_tpu)
+                                                     num_warmup_steps, use_tpu, changed=FLAGS.changed)
 
             output_spec = tf.estimator.EstimatorSpec(
                 mode=mode,

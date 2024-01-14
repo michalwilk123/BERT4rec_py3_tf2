@@ -23,20 +23,29 @@ import tensorflow as tf
 
 
 def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps,
-                     use_tpu):
+                     use_tpu, changed):
     """Creates an optimizer training op."""
     global_step = tf.compat.v1.train.get_or_create_global_step()
 
     learning_rate = tf.constant(value=init_lr, shape=[], dtype=tf.float32)
 
     # Implements linear decay of the learning rate.
-    learning_rate = tf.compat.v1.train.polynomial_decay(
-        learning_rate,
-        global_step,
-        num_train_steps//6,
-        end_learning_rate=1e-10,
-        power=1.0,
-        cycle=True)
+    if changed:
+        learning_rate = tf.compat.v1.train.polynomial_decay(
+            learning_rate,
+            global_step,
+            num_train_steps//6,
+            end_learning_rate=1e-10,
+            power=1.0,
+            cycle=True)
+    else:
+        learning_rate = tf.compat.v1.train.polynomial_decay(
+            learning_rate,
+            global_step,
+            num_train_steps,
+            end_learning_rate=0,
+            power=1.0,
+            cycle=False)
 
     # Implements linear warmup. I.e., if global_step < num_warmup_steps, the
     # learning rate will be `global_step/num_warmup_steps * init_lr`.
