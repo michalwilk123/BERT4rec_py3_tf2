@@ -28,10 +28,10 @@ python -u gen_data_fin.py \
     --pool_size=${pool_size} \
 
 
-CUDA_VISIBLE_DEVICES=1 python -u run.py \
+CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --train_input_file=./data/${dataset_name}${signature}.train.tfrecord \
     --test_input_file=./data/${dataset_name}${signature}.test.tfrecord \
-    --vocab_filename=./data/${dataset_name}${signature}.vocab \
+    --vocab_filename=./data/${dtaset_name}${signature}.vocab \
     --user_history_filename=./data/${dataset_name}${signature}.his \
     --checkpointDir=${CKPT_DIR}/${dataset_name} \
     --signature=${signature}-${dim} \

@@ -33,10 +33,10 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps,
     learning_rate = tf.compat.v1.train.polynomial_decay(
         learning_rate,
         global_step,
-        num_train_steps,
-        end_learning_rate=0.0,
+        num_train_steps//6,
+        end_learning_rate=1e-10,
         power=1.0,
-        cycle=False)
+        cycle=True)
 
     # Implements linear warmup. I.e., if global_step < num_warmup_steps, the
     # learning rate will be `global_step/num_warmup_steps * init_lr`.
