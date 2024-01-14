@@ -169,13 +169,17 @@ class EvalHooks(tf.estimator.SessionRunHook):
             self.probability = [value / sum_value for value in values]
 
     def end(self, session):
-        print(
-            "ndcg@1:{}, hit@1:{}， ndcg@5:{}, hit@5:{}, ndcg@10:{}, hit@10:{}, ap:{}, valid_user:{}".
-            format(self.ndcg_1 / self.valid_user, self.hit_1 / self.valid_user,
-                   self.ndcg_5 / self.valid_user, self.hit_5 / self.valid_user,
-                   self.ndcg_10 / self.valid_user,
-                   self.hit_10 / self.valid_user, self.ap / self.valid_user,
-                   self.valid_user))
+        strin = "ndcg@1:{}, hit@1:{}， ndcg@5:{}, hit@5:{}, ndcg@10:{}, hit@10:{}, ap:{}, valid_user:{}".format(
+            self.ndcg_1 / self.valid_user, self.hit_1 / self.valid_user,
+            self.ndcg_5 / self.valid_user, self.hit_5 / self.valid_user,
+            self.ndcg_10 / self.valid_user,
+            self.hit_10 / self.valid_user, self.ap / self.valid_user,
+            self.valid_user
+        )
+
+        with open("/log_file.txt", "a") as f:
+            f.write(strin)
+        print(strin)
 
     def before_run(self, run_context):
         variables = tf.compat.v1.get_collection('eval_sp')
