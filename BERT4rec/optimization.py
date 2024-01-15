@@ -30,22 +30,22 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps,
     learning_rate = tf.constant(value=init_lr, shape=[], dtype=tf.float32)
 
     # Implements linear decay of the learning rate.
-    if changed:
-        learning_rate = tf.compat.v1.train.polynomial_decay(
-            learning_rate,
-            global_step,
-            num_train_steps//6,
-            end_learning_rate=1e-10,
-            power=1.0,
-            cycle=True)
-    else:
-        learning_rate = tf.compat.v1.train.polynomial_decay(
-            learning_rate,
-            global_step,
-            num_train_steps,
-            end_learning_rate=0,
-            power=1.0,
-            cycle=False)
+    # if changed:
+    #     learning_rate = tf.compat.v1.train.polynomial_decay(
+    #         learning_rate,
+    #         global_step,
+    #         num_train_steps//6,
+    #         end_learning_rate=1e-10,
+    #         power=1.0,
+    #         cycle=True)
+    # else:
+    learning_rate = tf.compat.v1.train.polynomial_decay(
+        learning_rate,
+        global_step,
+        num_train_steps,
+        end_learning_rate=0,
+        power=1.0,
+        cycle=False)
 
     # Implements linear warmup. I.e., if global_step < num_warmup_steps, the
     # learning rate will be `global_step/num_warmup_steps * init_lr`.
@@ -63,16 +63,27 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps,
         learning_rate = ((1.0 - is_warmup) * learning_rate +
                          is_warmup * warmup_learning_rate)
 
-    # It is recommended that you use this optimizer for fine tuning, since this
-    # is how the model was trained (note that the Adam m/v variables are NOT
-    # loaded from init_checkpoint.)
-    optimizer = AdamWeightDecayOptimizer(
-        learning_rate=learning_rate,
-        weight_decay_rate=0.01,
-        beta_1=0.9,
-        beta_2=0.999,
-        epsilon=1e-6,
-        exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"])
+    if changed:
+        optimizer = tf.keras.optimizers.experimental.RMSprop(
+            learning_rate=learning_rate,
+            rho=0.9,  
+            weight_decay=0.01,
+            momentum=0.0,
+            epsilon=1e-6,
+            centered=False,
+            name='RMSProp_optimizer'
+        )
+    else:
+        # It is recommended that you use this optimizer for fine tuning, since this
+        # is how the model was trained (note that the Adam m/v variables are NOT
+        # loaded from init_checkpoint.)
+        optimizer = AdamWeightDecayOptimizer(
+            learning_rate=learning_rate,
+            weight_decay_rate=0.01,
+            beta_1=0.9,
+            beta_2=0.999,
+            epsilon=1e-6,
+            exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"])
 
     if use_tpu:
         optimizer = tf.compat.v1.tpu.CrossShardOptimizer(optimizer)
