@@ -65,7 +65,13 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps,
 
     if changed:
         optimizer = tf.keras.optimizers.experimental.RMSprop(
-            learning_rate=learning_rate,
+            learning_rate=tf.keras.optimizers.schedules.PolynomialDecay(
+                initial_learning_rate=init_lr,
+                decay_steps=num_train_steps,
+                end_learning_rate=0.0,
+                power=1.0,
+                cycle=False
+            ),
             rho=0.9,  
             weight_decay=0.01,
             momentum=0.0,
